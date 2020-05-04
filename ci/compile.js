@@ -29,12 +29,17 @@ if(envArgs.MODE === 'development'){
 const COMPILE_ENV = {
   target:envArgs.DIST_ABI||'build/contracts',
   contractSrc:envArgs.CONTRACT_PATH||'smart_v3/contracts',
-  compileVersion:envArgs.SOLC_VERSION||'soljson-v0.5.17+commit.d19bba13.js'
+  compileVersion:envArgs.SOLC_VERSION||'soljson-v0.5.17+commit.d19bba13.js',
+  es6:false
 }
 
 const ContractMapping = {
   'BasDomain.sol':""
 }
+
+const IgnoreLibs = [
+  'safemath','BasLib'
+]
 
 function compilingPreperations(){
   const buildPath = r(COMPILE_ENV.target)
@@ -85,7 +90,6 @@ function getImports(dependency) {
       return {
         contents:fs.readFileSync(r(COMPILE_ENV.contractSrc,'BasLib.sol'),'utf8')
       }
-
     case 'BasToken.sol':
       return {
         contents:fs.readFileSync(r(COMPILE_ENV.contractSrc,'BasToken.sol'),'utf8')
@@ -113,7 +117,15 @@ function getImports(dependency) {
     case 'BasMail.sol':
       return {
         contents:fs.readFileSync(r(COMPILE_ENV.contractSrc,'BasMail.sol'),'utf8')
-      }       
+      }  
+    case 'owned.sol':
+      return {
+        contents:fs.readFileSync(r(COMPILE_ENV.contractSrc,'owned.sol'),'utf8')
+      } 
+    case 'SafeMath.sol':
+      return {
+        contents:fs.readFileSync(r(COMPILE_ENV.contractSrc,'safemath.sol'),'utf8')
+      }                  
     default:
       return {error:`file ${dependency} not found.`}
   }
@@ -154,17 +166,20 @@ function writeOutput(compiled,buildPath) {
     }
 
     // const contractName = contractFileName.replace('.sol','')
-    // if(IgnoreLib.find(it => it === contractName)){
-    //   console.log(chalk.red('ignore lib'+contractName),'\n')
-    //   continue;
-    // }
+
 
     for(let idx in contractKeys){
       const contractName = contractKeys[idx]
-      console.log(chalk.green('Writing:'),chalk.yellow(contractName+'.json'))
 
+      if(IgnoreLibs.find(it => it === contractName)){
+        console.log(chalk.red('ignore lib'+contractName),'\n')
+        continue;
+      }
+
+      console.log(chalk.green('Writing:'),chalk.yellow(contractName+'.json'))
       //
-      NamePairs[contractName]=`import ${contractName} from './${contractName}.json'`
+      NamePairs[contractName] = COMPILE_ENV.es6 ? 
+        `import ${contractName} from './${contractName}.json'` : `const ${contractName} = require('./${contractName}.json')`
       //Contracts.push[contractName]
 
       fs.outputJsonSync(
@@ -221,8 +236,12 @@ async function writeIndex(){
     await fs.appendFile(indexFile,` * BAS build at:${tsTag} \n`,{encoding:'utf8'})
     await fs.appendFile(indexFile,` **\/\n`,{encoding:'utf8'})
 
-    await fs.appendFile(indexFile,`export default { \n`,{encoding:'utf8'})
-
+    if(COMPILE_ENV.es6){
+      await fs.appendFile(indexFile,`export default { \n`,{encoding:'utf8'})
+    }else{
+      await fs.appendFile(indexFile,`module.exports = { \n`,{encoding:'utf8'})
+    }
+    
     for(let i in keys){
       const content = keys[i]
       await fs.appendFile(indexFile,`  ${content},\n`,{encoding:'utf8'})

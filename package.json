@@ -4,9 +4,10 @@
   "description": "smart contracts CI",
   "main": "index.js",
   "scripts": {
-    "build":"node ci/compile.js",
-    "deploy":"node ci/deploy.js",
-    "update:v3":"git submodule update --remote smart_v3",
+    "start": "node ci/ganache-cli.js",
+    "build": "node ci/compile.js",
+    "deploy": "node ci/deploy.js",
+    "update:v3": "git submodule update --remote smart_v3",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,8 +19,12 @@
   "devDependencies": {
     "chalk": "^4.0.0",
     "dotenv": "^8.2.0",
+    "ethereumjs-util": "^7.0.0",
+    "ethereumjs-wallet": "^0.6.3",
     "fast-date-format": "^2.2.4",
     "fs-extra": "^9.0.0",
+    "ganache-cli": "^6.9.1",
+    "safe-buffer": "^5.2.0",
     "solc": "0.5.17"
   }
 }
