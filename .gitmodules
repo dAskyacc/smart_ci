@@ -1,0 +1,3 @@
+[submodule "smart_v3"]
+	path = smart_v3
+	url = git@bas:BASChain/smart_contract.git
