@@ -11,5 +11,12 @@
     "url": "git@bas:orchid2ev/smart_ci.git"
   },
   "author": "Orchid2ev",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "chalk": "^4.0.0",
+    "dotenv": "^8.2.0",
+    "fast-date-format": "^2.2.4",
+    "fs-extra": "^9.0.0",
+    "solc": "0.5.17"
+  }
 }
