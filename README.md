@@ -3,6 +3,12 @@ smart contracts CI
 
 ## Useage
 
+> update smart_contracts coding
+
+```bash 
+git submodule update --remote smart_v3
+```
+
 > dependencies
 
 |  Module  |  Comments  |
@@ -11,10 +17,10 @@ smart contracts CI
 |  yarn  | version >= 1.19.0 |
 |  solc  | ^0.5.x  |
 
-> install
+> install dependencies package
 
 ```bash
-yarn install 
+yarn install or npm install
 ``` 
 
 ## Commands

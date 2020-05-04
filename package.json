@@ -4,6 +4,9 @@
   "description": "smart contracts CI",
   "main": "index.js",
   "scripts": {
+    "build":"node ci/compile.js",
+    "deploy":"node ci/deploy.js",
+    "update:v3":"git submodule update --remote smart_v3",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
