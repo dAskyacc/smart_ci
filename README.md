@@ -25,7 +25,8 @@ yarn install or npm install
 
 ## Commands
 
-```bash 
+```bash
+npm run start                   # start ganache client listen on 7545 
 npm run build                   # compiling contracts
 npm run deploy                  # deploy contracts to evm
 ```
@@ -39,10 +40,16 @@ file .env
 ```bash 
 DIST_ABI='build/contracts'
 CONTRACT_PATH='smart_v3/contracts'
+DEPLOYED_DIST='dist/contracts'
 SOLC_VERSION=
+AUTHOR=
+VERSION=v3
 MODE=development
-INFURA_SECRET=
-INFURA_PROJECTID=
+HOST=127.0.0.1
+PORT=7545
+CHAIN_ID=1337
+ACC_PRI_KEYS=0x......,0x......
+ACC_ADDRESSES=
 
 ```
 
