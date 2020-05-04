@@ -1,0 +1,15 @@
+{
+  "name": "smart_ci",
+  "version": "1.0.0",
+  "description": "smart contracts CI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@bas:orchid2ev/smart_ci.git"
+  },
+  "author": "Orchid2ev",
+  "license": "MIT"
+}
