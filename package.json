@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node ci/ganache-cli.js",
     "build": "node ci/compile.js",
-    "deploy": "node ci/deploy.js",
+    "redeploy":"run-s build deploy:contracts",
+    "deploy:contracts": "node ci/deploy.js",
+    "clear:db": "node ci/clear-ganache-cli.js",
     "update:v3": "git submodule update --remote smart_v3",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,6 +26,7 @@
     "fast-date-format": "^2.2.4",
     "fs-extra": "^9.0.0",
     "ganache-cli": "^6.9.1",
+    "run-all": "^1.0.1",
     "safe-buffer": "^5.2.0",
     "solc": "0.5.17",
     "web3": "^1.2.7"

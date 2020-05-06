@@ -187,7 +187,7 @@ const Deployed = async ()=>{
     const buildAtTime = stdDateFormat.format(new Date())
 
     fs.ensureFileSync(indexfile)
-    const comments  = '\n'+
+    const comments  = ''+
                       '/** \n' +
                       ` * BAS smart_contract ${version} \n` +
                       ` * Build at: ${buildAtTime} \n` +
