@@ -53,31 +53,30 @@ const Deployed = async ()=>{
   }
 
   const BasToken                = await createContract(ContractsJSON.BasToken.abi,ContractsJSON.BasToken.bytecode,[],'BasToken')
+  
+  const BasRelations            = await createContract(ContractsJSON.BasRelations.abi,ContractsJSON.BasRelations.bytecode,[],'BasRelations')  
 
-  const BasExpiredOwnership     = await createContract(ContractsJSON.BasExpiredOwnership.abi,ContractsJSON.BasExpiredOwnership.bytecode,['mail'],'BasExpiredOwnership')
-  const BasTradableOwnership    = await createContract(ContractsJSON.BasTradableOwnership.abi,ContractsJSON.BasTradableOwnership.bytecode,['domain'],'BasTradableOwnership')
+  const BasExpiredOwnership     = await createContract(ContractsJSON.BasExpiredOwnership.abi,ContractsJSON.BasExpiredOwnership.bytecode,[BasRelations._address],'BasExpiredOwnership')
+  const BasTradableOwnership    = await createContract(ContractsJSON.BasTradableOwnership.abi,ContractsJSON.BasTradableOwnership.bytecode,[BasRelations._address],'BasTradableOwnership')
 
-  const BasRootDomain           = await createContract(ContractsJSON.BasRootDomain.abi,ContractsJSON.BasRootDomain.bytecode,[BasTradableOwnership._address],'BasRootDomain')
-  const BasSubDomain            = await createContract(ContractsJSON.BasSubDomain.abi,ContractsJSON.BasSubDomain.bytecode,[BasTradableOwnership._address],'BasSubDomain')
-  const BasDomainConf           = await createContract(ContractsJSON.BasDomainConf.abi,ContractsJSON.BasDomainConf.bytecode,[BasTradableOwnership._address],'BasDomainConf')
+  const BasRootDomain           = await createContract(ContractsJSON.BasRootDomain.abi,ContractsJSON.BasRootDomain.bytecode,[BasRelations._address],'BasRootDomain')
+  const BasSubDomain            = await createContract(ContractsJSON.BasSubDomain.abi,ContractsJSON.BasSubDomain.bytecode,[BasRelations._address],'BasSubDomain')
+  const BasDomainConf           = await createContract(ContractsJSON.BasDomainConf.abi,ContractsJSON.BasDomainConf.bytecode,[BasRelations._address],'BasDomainConf')
 
-  const BasAccountant           = await createContract(ContractsJSON.BasAccountant.abi,ContractsJSON.BasAccountant.bytecode,[],'BasAccountant')
-  const BasMiner                = await createContract(ContractsJSON.BasMiner.abi,ContractsJSON.BasMiner.bytecode,[BasToken._address,BasAccountant._address],'BasMiner')
-  const BasOANN                 = await createContract(ContractsJSON.BasOANN.abi,ContractsJSON.BasOANN.bytecode,[BasToken._address,BasRootDomain._address,BasSubDomain._address,BasAccountant._address],'BasOANN')
+  const BasAccountant           = await createContract(ContractsJSON.BasAccountant.abi,ContractsJSON.BasAccountant.bytecode,[BasRelations._address],'BasAccountant')
+  const BasMiner                = await createContract(ContractsJSON.BasMiner.abi,ContractsJSON.BasMiner.bytecode,[BasRelations._address],'BasMiner')
+  const BasOANN                 = await createContract(ContractsJSON.BasOANN.abi,ContractsJSON.BasOANN.bytecode,[BasRelations._address],'BasOANN')
 
-  const BasMarket               = await createContract(ContractsJSON.BasMarket.abi,ContractsJSON.BasMarket.bytecode,[BasToken._address,BasRootDomain._address,BasSubDomain._address],'BasMarket')
+  const BasMarket               = await createContract(ContractsJSON.BasMarket.abi,ContractsJSON.BasMarket.bytecode,[BasRelations._address],'BasMarket')
 
-  const BasMail                 = await createContract(ContractsJSON.BasMail.abi,ContractsJSON.BasMail.bytecode,[BasExpiredOwnership._address],'BasMail')
-  const BasMailManager          = await createContract(ContractsJSON.BasMailManager.abi,ContractsJSON.BasMailManager.bytecode,[BasToken._address,BasAccountant._address,BasRootDomain._address,BasSubDomain._address,BasMail._address],'BasMailManager')
+  const BasMail                 = await createContract(ContractsJSON.BasMail.abi,ContractsJSON.BasMail.bytecode,[BasRelations._address],'BasMail')
+  const BasMailManager          = await createContract(ContractsJSON.BasMailManager.abi,ContractsJSON.BasMailManager.bytecode,[BasRelations._address],'BasMailManager')
 
-  const BasView                 = await createContract(ContractsJSON.BasView.abi,ContractsJSON.BasView.bytecode,[],'BasView')
-
-  //writing package
-  await buildDeployedPackage();
+  const BasView                 = await createContract(ContractsJSON.BasView.abi,ContractsJSON.BasView.bytecode,[BasRelations._address],'BasView')
 
 
-  /* link data */
-  await BasView.methods.setAddresses(
+  // link contract
+  await BasRelations.methods.setAddresses(
     BasToken._address,
     BasExpiredOwnership._address,
     BasTradableOwnership._address,
@@ -89,23 +88,45 @@ const Deployed = async ()=>{
     BasOANN._address,
     BasMarket._address,
     BasMail._address,
-    BasMailManager._address
-  ).send(Options)
+    BasMailManager._address,
+    BasView._address
+  ).send(Options);
 
-
-  await linkDataKeeper(BasTradableOwnership, BasRootDomain, Options);
-  await linkDataKeeper(BasTradableOwnership, BasSubDomain, Options);
-  await linkDataKeeper(BasTradableOwnership, BasMarket, Options); 
-  await linkDataKeeper(BasRootDomain, BasOANN, Options);
-  await linkDataKeeper(BasSubDomain, BasOANN, Options);
-  await linkDataKeeper(BasAccountant, BasOANN, Options);
-  await linkDataKeeper(BasAccountant, BasMailManager, Options);
-  await linkDataKeeper(BasMiner, BasAccountant, Options);
-  await linkDataKeeper(BasMail, BasMailManager, Options);
-  await linkDataKeeper(BasExpiredOwnership, BasMail, Options);
-
+  //
   await BasAccountant.methods.registerContractReceiver("miner", BasMiner._address).send(Options);  
 
+
+  /* link data */
+  // await BasView.methods.setAddresses(
+  //   BasToken._address,
+  //   BasExpiredOwnership._address,
+  //   BasTradableOwnership._address,
+  //   BasRootDomain._address,
+  //   BasSubDomain._address,
+  //   BasDomainConf._address,
+  //   BasAccountant._address,
+  //   BasMiner._address,
+  //   BasOANN._address,
+  //   BasMarket._address,
+  //   BasMail._address,
+  //   BasMailManager._address
+  // ).send(Options)
+
+
+  // await linkDataKeeper(BasTradableOwnership, BasRootDomain, Options);
+  // await linkDataKeeper(BasTradableOwnership, BasSubDomain, Options);
+  // await linkDataKeeper(BasTradableOwnership, BasMarket, Options); 
+  // await linkDataKeeper(BasRootDomain, BasOANN, Options);
+  // await linkDataKeeper(BasSubDomain, BasOANN, Options);
+  // await linkDataKeeper(BasAccountant, BasOANN, Options);
+  // await linkDataKeeper(BasAccountant, BasMailManager, Options);
+  // await linkDataKeeper(BasMiner, BasAccountant, Options);
+  // await linkDataKeeper(BasMail, BasMailManager, Options);
+  // await linkDataKeeper(BasExpiredOwnership, BasMail, Options);
+
+  
+  //writing package
+  await buildDeployedPackage();
 
   async function createContract(abi,bin,args,contractName) {
     let opts = Object.assign({},Options)

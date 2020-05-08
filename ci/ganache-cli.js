@@ -55,10 +55,10 @@ function getUnlockedAccounts(){
 let options = {
   port:envArgs.PORT||7545,
   network_id:envArgs.NETWORK_ID||5777,
-  db_path:r('build','db2'),
+  db_path:r('build','db'),
   keepAliveTimeout:50000,
   fork_block_number:1,
-  //default_balance_ether:200000000000000,
+  default_balance_ether:200,
 
   //unlocked_accounts:getUnlockedAccounts()
 }

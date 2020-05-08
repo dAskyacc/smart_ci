@@ -192,7 +192,19 @@ function writeOutput(compiled,buildPath) {
           spaces:2,
           EOL:'\n'
         }
-      );      
+      );  
+
+      
+      // const abi = compiled.contracts[contractFileName][contractName].abi||[] 
+      // fs.outputJsonSync(
+      //   r(buildPath,`${contractName}.abi`),
+      //   [...abi]
+      // );   
+
+      // const bytecode = compiled.contracts[contractFileName][contractName].evm.bytecode.object||''
+      // const binfile = r(buildPath,`${contractName}.bin`)
+      // fs.ensureFileSync(binfile)
+      // fs.outputFileSync(binfile,bytecode,{encoding:'utf8'})             
     }
   }
 }
