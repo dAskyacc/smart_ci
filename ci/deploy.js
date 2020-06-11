@@ -4,6 +4,7 @@ const chalk       = require("chalk"),
   path            = require('path'),
   pkgJson         = require('../package.json').version;
 
+const LOCAL_ADDRESSES = "ganache-address.js";
 
 const Web3 = require('web3')
 const ContractsJSON =require('../build/contracts')
@@ -95,7 +96,7 @@ const Deployed = async ()=>{
     ).send(Options);
 
     // //
-    await BasAccountant.methods.registerContractReceiver("miner", BasMiner._address).send(Options);  
+    //await BasAccountant.methods.registerContractReceiver("miner", BasMiner._address).send(Options);  
 
     //writing package
     await buildDeployedPackage();
@@ -152,16 +153,19 @@ const Deployed = async ()=>{
   }
 
   async function buildDeployedPackage(){
+
     const abiJsons = DeployResult.success
 
     const distPath = preparedDistDir()
     fs.ensureDirSync(distPath)
+
 
     if(!abiJsons|| !abiJsons.length)return;
 
     for(let i = 0;i<abiJsons.length;i++){
       const name = abiJsons[i].contractName
       console.log(chalk.yellow(`Writing ${name} Json`))
+      //console.log(chalk.yellow(`Writing  Json`,abiStr))
       fs.outputJsonSync(
         r(distPath,`${name}.json`),
         abiJsons[i],
@@ -170,10 +174,85 @@ const Deployed = async ()=>{
           EOL:'\n'
         }        
       )
+
     }
 
-    generatePackageIndex(abiJsons,distPath)
+    // fs.outputFileSync(
+    //   ganacheJsonPath,
+    //   JSON.stringify(GanacheJson),
+    //   'utf8'      
+    // )
+
+    generatePackageIndex(abiJsons,distPath);
+    generaGanacheABIS(abiJsons);
+    generateGanacheAddress(abiJsons,distPath)
   }
+
+  async function generaGanacheABIS(abiJsons){
+    const abisFilePath = preparedABIDistJSFile()
+    fs.ensureFileSync(abisFilePath)
+
+
+    if(!abiJsons|| !abiJsons.length)return;
+    const len = abiJsons.length;
+    const buildAtTime = stdDateFormat.format(new Date())
+    //begin
+    //comments 
+    const comments = '/**\n' +
+                      ` * Smart_Contract ${version} \n`+
+                      ` * Build Time : ${buildAtTime} \n` +
+                      ` * BasChain.org \n` +
+                      ' */\n';
+
+    fs.outputFileSync(abisFilePath,comments,{encoding:'utf8'})
+
+    const suffix = 'Json'
+    for(let k=0;k<len;k++){
+      const name = abiJsons[k]["contractName"]
+
+      if(abiJsons[k]["abi"] && abiJsons[k]["abi"]){
+        const abiJsonStr = JSON.stringify(abiJsons[k]["abi"])
+
+        const appendLine = `const ${name}${suffix} = ` + abiJsonStr +';\n'
+
+        await fs.appendFile(abisFilePath,appendLine,{encoding:'utf8'})
+      }
+    }
+
+    await fs.appendFile(abisFilePath,'//end',{encoding:'utf8'})
+  }
+
+  async function generateGanacheAddress(abiJsons,distPath){
+    const ganacheFile = r(distPath,'ganache.json')
+
+    fs.ensureFileSync(ganacheFile)
+
+    if(!abiJsons|| !abiJsons.length)return;
+
+    let jsonObj = {}
+    const len = abiJsons.length;
+    for(let k=0;k<len;k++){
+      const name = abiJsons[k]["contractName"]
+      if(abiJsons[k]["networks"] && abiJsons[k]["networks"]["1337"]){
+        const addr = abiJsons[k]["networks"]["1337"]["address"]
+
+        if(addr)jsonObj[name] = {1337:addr}
+      }
+    }
+
+    fs.outputJsonSync(
+      ganacheFile,
+      jsonObj,
+      {
+        spaces:2,
+        EOL:'\n'
+      }        
+    )
+  }
+
+
+
+
 
   function preparedDistDir(){
     const distPath = r(deployedDist)
@@ -181,12 +260,38 @@ const Deployed = async ()=>{
     return distPath
   }
 
+  function preparedABIDistDir(){
+    const distABIS = r('dist/abis')
+    fs.removeSync(distABIS)
+    return distABIS
+  }
+
+  function preparedABIDistJSFile(){
+    const distJsABIs = r('dist/abis/all.js')
+    fs.removeSync(distJsABIs)
+    return distJsABIs
+  }
+
+  async function generateABIs(abisJsons,distPath){
+    const suffix = "Json"
+
+    const len = abisJsons.length
+
+    for(let i = 0 ;i<len;i++){
+      //const name 
+    }
+  }
+
   async function generatePackageIndex(abiJsons,distPath){
 
     const indexfile = r(distPath,'index.js')
     const buildAtTime = stdDateFormat.format(new Date())
 
+    const localAddresses = r(distPath,'ganache.json')
+
     fs.ensureFileSync(indexfile)
+
+
     const comments  = ''+
                       '/** \n' +
                       ` * BAS smart_contract ${version} \n` +
@@ -214,6 +319,8 @@ const Deployed = async ()=>{
     }
     await fs.appendFile(indexfile,'}\n',{encoding:'utf8'})
   }
+
+
 
   function preparedLog(logfile,chainId,address){
     const ts = stdDateFormat.format(new Date())
