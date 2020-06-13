@@ -220,6 +220,8 @@ const Deployed = async ()=>{
     }
 
     await fs.appendFile(abisFilePath,'//end',{encoding:'utf8'})
+
+  
   }
 
   async function generateGanacheAddress(abiJsons,distPath){
