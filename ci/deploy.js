@@ -213,7 +213,7 @@ const Deployed = async ()=>{
       if(abiJsons[k]["abi"] && abiJsons[k]["abi"]){
         const abiJsonStr = JSON.stringify(abiJsons[k]["abi"])
 
-        const appendLine = `const ${name}${suffix} = ` + abiJsonStr +';\n'
+        const appendLine = `if(typeof ${name}${suffix} === 'undefined') {var ${name}${suffix} = ` + abiJsonStr +';}\n'
 
         await fs.appendFile(abisFilePath,appendLine,{encoding:'utf8'})
       }
