@@ -79,6 +79,7 @@ const Deployed = async ()=>{
     const BasView                 = await createContract(ContractsJSON.BasView.abi,ContractsJSON.BasView.bytecode,[BasRelations._address],'BasView')
 
 
+
     // link contract
     await BasRelations.methods.setAddresses(
       BasToken._address,
